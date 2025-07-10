@@ -4,15 +4,44 @@ import 'package:fl_chart/fl_chart.dart';
 import 'search_bloc.dart';
 import 'package:provider/provider.dart';
 
-class CompanyDetailsScreen extends StatelessWidget {
+class CompanyDetailsScreen extends StatefulWidget {
+  @override
+  _CompanyDetailsScreenState createState() => _CompanyDetailsScreenState();
+}
+
+class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  String _selectedChart = 'EBITDA';
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Company Detail'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       body: Consumer<SearchBloc>(
         builder: (context, searchBloc, child) {
@@ -23,100 +52,147 @@ class CompanyDetailsScreen extends StatelessWidget {
                 return Center(child: CircularProgressIndicator());
               } else if (state is CompanySuccess) {
                 final details = state.details;
-                // Extract issuer details
                 final issuerDetails = (details['issuer_details'] as Map?) ?? {};
                 final prosCons = (details['pros_and_cons'] as Map?) ?? {};
 
                 return SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Company Header
+                      // Company Header Section
                       Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        color: Colors.white,
+                        padding: EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Company Logo and Name
+                            Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'INFRA.',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                               
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                            
+                            // Company Name
                             Text(
                               details['company_name'] ?? 'Unknown Company',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'ISIN: ${details['isin'] ?? 'N/A'}',
-                              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24),
-
-                      // Issuer Details Section
-                      _buildInfoSection('Issuer Information', [
-                        _buildInfoRow('Issuer Name', issuerDetails['issuername']),
-                        _buildInfoRow('Type of Issuer', issuerDetails['typeof_issuer']),
-                        _buildInfoRow('Sector', issuerDetails['sector']),
-                        _buildInfoRow('Industry', issuerDetails['industry']),
-                        _buildInfoRow('CIN', issuerDetails['cin']),
-                      ]),
-                      SizedBox(height: 24),
-
-                      // Financial Chart Section
-                      if ((details['financials'] as Map?) != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Financials',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
                             SizedBox(height: 12),
-                            _buildChart(
-                              (details['financials'] as Map)['ebitda'] ?? [],
-                              'EBITDA',
-                              Colors.blue,
+                            
+                            // Company Description
+                            Text(
+                              details['description'] ?? 'No description available',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                height: 1.4,
+                              ),
                             ),
                             SizedBox(height: 16),
-                            _buildChart(
-                              (details['financials'] as Map)['revenue'] ?? [],
-                              'Revenue',
-                              Colors.green,
-                            ),
-                          ],
-                        ),
-                      SizedBox(height: 24),
-
-                      // Pros & Cons Section
-                      if (prosCons.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Pros & Cons',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 12),
+                            
+                            // ISIN and Status
                             Row(
                               children: [
-                                Expanded(
-                                  child: _buildCard('Pros', Colors.green, (prosCons['pros'] as List).join('\n')),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    'ISIN: ${details['isin'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                      color: Colors.blue[700],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                                 SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildCard('Cons', Colors.red, (prosCons['cons'] as List).join('\n')),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green[50],
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    details['status'] ?? 'ACTIVE',
+                                    style: TextStyle(
+                                      color: Colors.green[700],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ],
                         ),
+                      ),
+                      
+                      SizedBox(height: 8),
+                      
+                      // Tab Bar
+                      Container(
+                        color: Colors.white,
+                        child: TabBar(
+                          controller: _tabController,
+                          labelColor: Colors.blue[600],
+                          unselectedLabelColor: Colors.grey[600],
+                          indicatorColor: Colors.blue[600],
+                          indicatorWeight: 3,
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                          unselectedLabelStyle: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                          ),
+                          tabs: [
+                            Tab(text: 'ISIN Analysis'),
+                            Tab(text: 'Pros & Cons'),
+                          ],
+                        ),
+                      ),
+                      
+                      // Tab Content
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            // ISIN Analysis Tab
+                            _buildISINAnalysisTab(details, issuerDetails),
+                            // Pros & Cons Tab
+                            _buildProsConsTab(prosCons),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -149,49 +225,211 @@ class CompanyDetailsScreen extends StatelessWidget {
     );
   }
 
-  // Rest of the helper methods remain the same...
-  Widget _buildInfoSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 12),
-        Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+  Widget _buildISINAnalysisTab(Map details, Map issuerDetails) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: 16),
+          
+          // Company Financials Section
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'COMPANY FINANCIALS',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        _buildChartToggle('EBITDA', Colors.blue),
+                        SizedBox(width: 16),
+                        _buildChartToggle('Revenue', Colors.grey),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                
+                // Chart
+                if ((details['financials'] as Map?) != null)
+                  _buildModernChart(details['financials'] as Map),
+              ],
+            ),
           ),
-          child: Column(
-            children: children,
+          
+          SizedBox(height: 16),
+          
+          // Issuer Details Section
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.business, size: 20, color: Colors.grey[600]),
+                    SizedBox(width: 8),
+                    Text(
+                      'Issuer Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                
+                _buildDetailRow('Issuer Name', issuerDetails['issuer_name']),
+                _buildDetailRow('Type of Issuer', issuerDetails['type_of_issuer']),
+                _buildDetailRow('Sector', issuerDetails['sector']),
+                _buildDetailRow('Industry', issuerDetails['industry']),
+                _buildDetailRow('Issuer nature', issuerDetails['issuer_nature']),
+                _buildDetailRow('Corporate Identity Number (CIN)', issuerDetails['cin']),
+                _buildDetailRow('Name of the Lead Manager', issuerDetails['lead_manager'] ?? '-'),
+                _buildDetailRow('Registrar', issuerDetails['registrar']),
+                _buildDetailRow('Name of Debenture Trustee', issuerDetails['debenture_trustee']),
+              ],
+            ),
           ),
-        ),
-      ],
+          
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
-  Widget _buildInfoRow(String label, dynamic value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+  Widget _buildProsConsTab(Map prosCons) {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Pros and Cons',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 24),
+            
+            // Pros Section
+            Text(
+              'Pros',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.green[700],
+              ),
+            ),
+            SizedBox(height: 12),
+            
+            if (prosCons['pros'] != null)
+              ...((prosCons['pros'] as List).map((pro) => _buildProsConsItem(pro, true))),
+            
+            SizedBox(height: 24),
+            
+            // Cons Section
+            Text(
+              'Cons',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange[700],
+              ),
+            ),
+            SizedBox(height: 12),
+            
+            if (prosCons['cons'] != null)
+              ...((prosCons['cons'] as List).map((con) => _buildProsConsItem(con, false))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProsConsItem(String text, bool isPros) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[700]),
+          Container(
+            margin: EdgeInsets.only(top: 4),
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: isPros ? Colors.green[50] : Colors.orange[50],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              isPros ? Icons.check : Icons.warning,
+              size: 12,
+              color: isPros ? Colors.green[600] : Colors.orange[600],
             ),
           ),
+          SizedBox(width: 12),
           Expanded(
-            flex: 3,
             child: Text(
-              value?.toString() ?? 'N/A',
-              style: TextStyle(color: Colors.black87),
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[800],
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -199,16 +437,37 @@ class CompanyDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChart(List<dynamic> data, String label, Color color) {
+  Widget _buildChartToggle(String label, Color color) {
+    final isSelected = _selectedChart == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedChart = label;
+        });
+      },
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: isSelected ? Colors.blue[600] : Colors.grey[500],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernChart(Map financials) {
+    final data = _selectedChart == 'EBITDA' 
+        ? (financials['ebitda'] as List?) ?? []
+        : (financials['revenue'] as List?) ?? [];
+    
     if (data.isEmpty) {
       return Container(
         height: 200,
-        child: Card(
-          child: Center(
-            child: Text(
-              'No data available for $label',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+        child: Center(
+          child: Text(
+            'No data available for $_selectedChart',
+            style: TextStyle(color: Colors.grey[600]),
           ),
         ),
       );
@@ -224,9 +483,9 @@ class CompanyDetailsScreen extends StatelessWidget {
           barRods: [
             BarChartRodData(
               toY: value,
-              color: color,
-              width: 16,
-              borderRadius: BorderRadius.circular(4),
+              color: _selectedChart == 'EBITDA' ? Colors.blue : Colors.grey[800],
+              width: 12,
+              borderRadius: BorderRadius.circular(2),
             ),
           ],
         ),
@@ -235,89 +494,96 @@ class CompanyDetailsScreen extends StatelessWidget {
 
     return Container(
       height: 200,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
-                ),
-              ),
-              SizedBox(height: 8),
-              Expanded(
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: _getMaxValue(data) * 1.2,
-                    barGroups: barGroups,
-                    titlesData: FlTitlesData(
-                      show: true,
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  data[index]['month']?.toString() ?? '',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              );
-                            }
-                            return Text('');
-                          },
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          maxY: _getMaxValue(data) * 1.2,
+          barGroups: barGroups,
+          titlesData: FlTitlesData(
+            show: true,
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < data.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        data[index]['month']?.toString().substring(0, 1) ?? '',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
                         ),
                       ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          getTitlesWidget: (value, meta) {
-                            return Text(
-                              _formatValue(value),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: Colors.grey[300]!,
-                          strokeWidth: 1,
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                    );
+                  }
+                  return Text('');
+                },
               ),
-            ],
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    _formatValue(value),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 10,
+                    ),
+                  );
+                },
+              ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Colors.grey[200]!,
+                strokeWidth: 1,
+              );
+            },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, dynamic value) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.blue[600],
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            value?.toString() ?? 'N/A',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -339,33 +605,5 @@ class CompanyDetailsScreen extends StatelessWidget {
     } else {
       return value.toStringAsFixed(0);
     }
-  }
-
-  Widget _buildCard(String title, MaterialColor color, String content) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color[700],
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            content,
-            style: TextStyle(fontSize: 14),
-          ),
-        ],
-      ),
-    );
   }
 }
