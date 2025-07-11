@@ -569,7 +569,7 @@ Widget _buildModernChart(Map financials) {
           // Revenue bar (background - light blue)
           BarChartRodData(
             toY: revenueValue,
-            color: _selectedChart == 'EBITDA' ? Colors.blue[100]!.withOpacity(0.3) : Colors.blue[600]!,
+            color: _selectedChart == 'EBITDA' ? Colors.blue[100]!.withOpacity(0.3) : Color(0xFF155DFC),
             width: 16,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -713,25 +713,6 @@ String _formatFixedValue(double value) {
         ],
       ),
     );
-  }
-
-  double _getMaxValue(List<dynamic> data) {
-    double max = 0;
-    for (var item in data) {
-      final value = (item['value'] as num?)?.toDouble() ?? 0.0;
-      if (value > max) max = value;
-    }
-    return max;
-  }
-
-  String _formatValue(double value) {
-    if (value >= 1000000) {
-      return '₹${(value / 1000000).toStringAsFixed(1)}L';
-    } else if (value >= 1000) {
-      return '₹${(value / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '₹${value.toStringAsFixed(0)}';
-    }
   }
 }
 
