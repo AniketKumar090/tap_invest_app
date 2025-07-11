@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'search_bloc.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class CompanyDetailsScreen extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFF3F4F6),
       body: Consumer<SearchBloc>(
         builder: (context, searchBloc, child) {
           return BlocBuilder<SearchBloc, SearchState>(
@@ -47,7 +48,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
                   children: [
                     // Fixed App Bar
                     Container(
-                      color: Colors.white,
+                      color: Color(0xFFF3F4F6),
                       child: SafeArea(
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -58,7 +59,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
                                 height: 36,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white70,
+                                  color: Colors.white,
                                   border: Border.all(
                                     color: Colors.grey[200]!,
                                     width: 1.5,
@@ -84,7 +85,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
                           return <Widget>[
                             SliverToBoxAdapter(
                               child: Container(
-                                color: Colors.white,
+                                color: Color(0xFFF3F4F6),
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(16, 2, 16, 20),
                                   child: Column(
@@ -303,22 +304,7 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
                         ),
                       ),
                     ),
-                    Container(
-                      constraints: BoxConstraints(maxWidth: 150),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildChartToggle('EBITDA', Colors.blue),
-                            _buildChartToggle('Revenue', Colors.grey),
-                          ],
-                        ),
-                      ),
-                    ),
+                    _buildChartToggleGroup(),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -458,42 +444,70 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
   }
 
   Widget _buildProsConsItem(String text, bool isPros) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 2),
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: isPros ? Colors.green[100] : Colors.orange[100],
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isPros ? Icons.check : Icons.warning_amber_rounded,
-              size: 14,
-              color: isPros ? Colors.green[700] : Colors.orange[700],
-            ),
+  return Container(
+    margin: EdgeInsets.only(bottom: 12),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 2),
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: isPros ? Colors.green[100] : Colors.orange[100],
+            shape: BoxShape.circle,
           ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-                height: 1.4,
+          child: isPros 
+            ? Icon(
+                Icons.check,
+                size: 14,
+                color: Colors.green[700],
+              )
+            : Center(
+                child: Text(
+                  '!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange[700],
+                  ),
+                ),
               ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              height: 1.4,
             ),
           ),
+        ),
+      ],
+    ),
+  );
+}
+
+  Widget _buildChartToggleGroup() {
+    return Container(
+      padding: EdgeInsets.all(3), // Added padding for space between edges and border
+      decoration: BoxDecoration(
+        color: Colors.grey[200], // Changed from grey[100] to grey[200] for better contrast
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildChartToggle('EBITDA', true),
+          _buildChartToggle('Revenue', false),
         ],
       ),
     );
   }
 
-  Widget _buildChartToggle(String label, Color color) {
+  Widget _buildChartToggle(String label, bool isFirst) {
     final isSelected = _selectedChart == label;
     return GestureDetector(
       onTap: () {
@@ -504,96 +518,125 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue[600] : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? Colors.white : Colors.grey[200], // Changed from transparent to white
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(isFirst ? 17 : 0), // Reduced from 20 to 17 for inner spacing
+            bottomLeft: Radius.circular(isFirst ? 17 : 0),
+            topRight: Radius.circular(isFirst ? 0 : 17),
+            bottomRight: Radius.circular(isFirst ? 0 : 17),
+          ),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : Colors.grey[600],
+            color: isSelected ? Colors.black : Colors.grey[600],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildModernChart(Map financials) {
-    final data = _selectedChart == 'EBITDA' 
-        ? (financials['ebitda'] as List?) ?? []
-        : (financials['revenue'] as List?) ?? [];
+Widget _buildModernChart(Map financials) {
+  final ebitdaData = (financials['ebitda'] as List?) ?? [];
+  final revenueData = (financials['revenue'] as List?) ?? [];
+  
+  if (ebitdaData.isEmpty && revenueData.isEmpty) {
+    return Container(
+      height: 200,
+      child: Center(
+        child: Text(
+          'No data available',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+      ),
+    );
+  }
+
+  List<BarChartGroupData> barGroups = [];
+  final maxLength = math.max(ebitdaData.length, revenueData.length);
+  
+  for (int i = 0; i < maxLength; i++) {
+    final ebitdaValue = i < ebitdaData.length ? (ebitdaData[i]['value'] as num?)?.toDouble() ?? 0.0 : 0.0;
+    final revenueValue = i < revenueData.length ? (revenueData[i]['value'] as num?)?.toDouble() ?? 0.0 : 0.0;
     
-    if (data.isEmpty) {
-      return Container(
-        height: 200,
-        child: Center(
-          child: Text(
-            'No data available for $_selectedChart',
-            style: TextStyle(color: Colors.grey[600]),
+    // Single group with overlapping bars
+    barGroups.add(
+      BarChartGroupData(
+        x: i,
+        barRods: [
+          // Revenue bar (background - light blue)
+          BarChartRodData(
+            toY: revenueValue,
+            color: _selectedChart == 'EBITDA' ? Colors.blue[100]!.withOpacity(0.3) : Colors.blue[600]!,
+            width: 16,
+            borderRadius: BorderRadius.circular(4),
           ),
-        ),
-      );
-    }
+          // EBITDA bar (foreground - dark) - overlapping
+          BarChartRodData(
+            toY: ebitdaValue,
+            color: _selectedChart == 'EBITDA' ? Colors.black87 : Colors.transparent,
+            width: 16,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
+        barsSpace: -16, // Negative space to make bars overlap completely
+      ),
+    );
+  }
 
-    List<BarChartGroupData> barGroups = [];
-    for (int i = 0; i < data.length; i++) {
-      final item = data[i];
-      final value = (item['value'] as num?)?.toDouble() ?? 0.0;
-      barGroups.add(
-        BarChartGroupData(
-          x: i,
-          barRods: [
-            BarChartRodData(
-              toY: value,
-              color: _selectedChart == 'EBITDA' ? Colors.blue[600] : Colors.grey[700],
-              width: 16,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return BarChart(
-      BarChartData(
-        alignment: BarChartAlignment.spaceAround,
-        maxY: _getMaxValue(data) * 1.2,
-        barGroups: barGroups,
-        titlesData: FlTitlesData(
-          show: true,
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 30,
-              getTitlesWidget: (value, meta) {
-                final index = value.toInt();
-                if (index >= 0 && index < data.length) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      data[index]['month']?.toString().substring(0, 1) ?? '',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
+  return BarChart(
+    BarChartData(
+      alignment: BarChartAlignment.spaceAround,
+      maxY: 35000000, // Space for 40L (40 Lakh) but don't show label
+      minY: 0,
+      barGroups: barGroups,
+      titlesData: FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              if (index >= 0 && index < maxLength) {
+                // Get month from either dataset
+                String month = '';
+                if (index < ebitdaData.length && ebitdaData[index]['month'] != null) {
+                  month = ebitdaData[index]['month'].toString();
+                } else if (index < revenueData.length && revenueData[index]['month'] != null) {
+                  month = revenueData[index]['month'].toString();
                 }
-                return Text('');
-              },
-            ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 45,
-              getTitlesWidget: (value, meta) {
+                
                 return Padding(
-                  padding: const EdgeInsets.only(right: 4.0),
+                  padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
-                    _formatValue(value),
+                    month.isNotEmpty ? month.substring(0, 1) : '',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }
+              return Text('');
+            },
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 20,
+            interval: 1000000, // 10L intervals
+            getTitlesWidget: (value, meta) {
+              // Only show labels for 0, 10L, 20L, 30L (not 40L)
+              if (value == 0 || value == 10000000 || value == 20000000 || value == 30000000) {
+                return Padding(
+                  padding: EdgeInsets.only(right: 4.0),
+                  child: Text(
+                    _formatFixedValue(value),
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 9,
@@ -601,31 +644,48 @@ class _CompanyDetailsScreenState extends State<CompanyDetailsScreen> with Single
                     ),
                   ),
                 );
-              },
-            ),
-          ),
-          topTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          rightTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
+              }
+              return const SizedBox(); // Don't show 40L label
+            },
           ),
         ),
-        borderData: FlBorderData(show: false),
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: false,
-          getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: Colors.grey[200]!,
-              strokeWidth: 1,
-            );
-          },
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
         ),
-        backgroundColor: Colors.transparent,
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
       ),
-    );
-  }
+      borderData: FlBorderData(show: false),
+      gridData: FlGridData(
+        show: true,
+        drawVerticalLine: false,
+        horizontalInterval: 10000000, // 10L intervals only
+        getDrawingHorizontalLine: (value) {
+          // Show thin gray lines only at 10L, 20L, 30L
+          if (value == 10000000 || value == 20000000 || value == 30000000) {
+            return FlLine(
+              color: Colors.grey[300]!,
+              strokeWidth: 0.5,
+            );
+          }
+          return const FlLine(color: Colors.transparent, strokeWidth: 0);
+        },
+      ),
+      backgroundColor: Colors.transparent,
+      // Removed extraLinesData to prevent gridlines from overlaying bars
+      // Instead, we'll use a custom approach
+    ),
+  );
+}
+
+// Add this new method for fixed Y-axis formatting
+String _formatFixedValue(double value) {
+  if (value == 10000000) return '₹1L';
+  if (value == 20000000) return '₹2L';
+  if (value == 30000000) return '₹3L';
+  return '';
+}
 
   Widget _buildDetailRow(String label, dynamic value) {
     return Container(
@@ -689,7 +749,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Colors.white,
+      color: Color(0xFFF3F4F6),
       child: Container(
         decoration: BoxDecoration(
           border: Border(

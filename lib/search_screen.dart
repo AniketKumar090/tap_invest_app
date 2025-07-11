@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
       },
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
-        backgroundColor: Color(0xFFF3F4F6), // Gray background
+        backgroundColor: Color(0xFFF6F6F6), // Updated background color
         appBar: AppBar(
           title: Text(
             'Home',
@@ -80,7 +80,8 @@ class _SearchScreenState extends State<SearchScreen> {
               color: Colors.black,
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFF6F6F6),
+          surfaceTintColor: Colors.transparent,
           foregroundColor: Colors.black,
           elevation: 0,
           titleSpacing: 16,
@@ -88,7 +89,7 @@ class _SearchScreenState extends State<SearchScreen> {
         body: Column(
           children: [
             Container(
-              color: Colors.white,
+              color: Color(0xFFF6F6F6),
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: _searchController,
@@ -162,8 +163,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
                   
                   if (state is SearchLoading && _cachedBonds.isEmpty) {
-                    return Center(
-                      child: Column(
+                    return Container(
+                      color: Color(0xFFF6F6F6),
+                    child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircularProgressIndicator(),
@@ -181,15 +183,20 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
                   
                   if (state is CompanyLoading) {
-                    return Center(child: CircularProgressIndicator());
+                    return Container(
+                      color: Color(0xFFF6F6F6), // Updated background color
+                      child: Center(child: CircularProgressIndicator()),
+                    );
                   }
 
                   if (_cachedBonds.isNotEmpty && !_showSuggestions) {
                     final bondsToShow = _currentQuery.isEmpty ? _cachedBonds : _getFilteredBonds();
                     
                     if (bondsToShow.isEmpty) {
-                      return Center(
-                        child: Column(
+                      return Container(
+                        color: Color(0xFFF6F6F6), // Updated background color
+                        child: Center(
+                          child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -216,73 +223,81 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                           ],
                         ),
-                      );
-                    }
+                      ),
+                    );
+                  }
 
                     return _buildHomeView(bondsToShow);
                   }
 
                   if (state is SearchFailure) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.red[300],
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Something went wrong',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.red[600],
-                              fontWeight: FontWeight.w500,
+                    return Container(
+                      color: Color(0xFFF6F6F6), // Updated background color
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: Colors.red[300],
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Error: ${state.error}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.red[400],
+                            SizedBox(height: 16),
+                            Text(
+                              'Something went wrong',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.red[600],
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 16),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              context.read<SearchBloc>().add(LoadBondList());
-                            },
-                            icon: Icon(Icons.refresh),
-                            label: Text('Retry'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
+                            SizedBox(height: 8),
+                            Text(
+                              'Error: ${state.error}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.red[400],
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                context.read<SearchBloc>().add(LoadBondList());
+                              },
+                              icon: Icon(Icons.refresh),
+                              label: Text('Retry'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
 
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text(
-                          'Loading bonds...',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
+
+                  return Container(
+                    color: Color(0xFFF6F6F6), // Updated background color
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text(
+                            'Loading bonds...',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -298,7 +313,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final terms = _currentQuery.toLowerCase().split(' ').where((term) => term.isNotEmpty).toList();
     
     return Container(
-      color: Colors.white,
+      color: Color(0xFFF6F6F6), // Updated background color
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -315,13 +330,24 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              itemCount: bonds.length,
-              itemBuilder: (context, index) {
-                final bond = bonds[index];
-                return _buildSuggestionItem(bond, terms);
-              },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: bonds.length,
+                  itemBuilder: (context, index) {
+                    return _buildSuggestionItem(bond: bonds[index], terms: terms, index: index, totalItems: bonds.length);
+                  },
+                ),
+              ),
             ),
           ),
         ],
@@ -335,7 +361,7 @@ class _SearchScreenState extends State<SearchScreen> {
     
     if (suggestions.isEmpty) {
       return Container(
-        color: Colors.white,
+        color: Color(0xFFF6F6F6), // Updated background color
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(32.0),
@@ -354,7 +380,7 @@ class _SearchScreenState extends State<SearchScreen> {
     String headerText = _currentQuery.isEmpty ? 'SUGGESTED RESULTS' : 'SEARCH RESULTS';
 
     return Container(
-      color: Colors.white,
+      color: Color(0xFFF6F6F6), // Updated background color
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -371,13 +397,24 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              itemCount: suggestions.length,
-              itemBuilder: (context, index) {
-                final bond = suggestions[index];
-                return _buildSuggestionItem(bond, terms);
-              },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: suggestions.length,
+                  itemBuilder: (context, index) {
+                    return _buildSuggestionItem(bond: suggestions[index], terms: terms, index: index, totalItems: suggestions.length);
+                  },
+                ),
+              ),
             ),
           ),
         ],
@@ -418,28 +455,50 @@ class _SearchScreenState extends State<SearchScreen> {
               color: shouldPrefixBeBlack ? Colors.black : Colors.grey[500],
             ),
           ),
-          TextSpan(
-            text: suffix,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-              backgroundColor: suffixMatches ? Colors.yellow[200] : null,
+          if (suffix.isNotEmpty)
+            ..._buildHighlightedTextSpans(
+              suffix,
+              terms,
+              TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildSuggestionItem(dynamic bond, List<String> terms) {
+  Widget _buildSuggestionItem({required dynamic bond, required List<String> terms, required int index, required int totalItems}) {
+    BorderRadius borderRadius;
+    
+    if (index == 0 && index == totalItems - 1) {
+      // Single item
+      borderRadius = BorderRadius.circular(16);
+    } else if (index == 0) {
+      // First item
+      borderRadius = BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      );
+    } else if (index == totalItems - 1) {
+      // Last item
+      borderRadius = BorderRadius.only(
+        bottomLeft: Radius.circular(16),
+        bottomRight: Radius.circular(16),
+      );
+    } else {
+      // Middle items
+      borderRadius = BorderRadius.zero;
+    }
+
     return Container(
-      margin: EdgeInsets.only(bottom: 1),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white, // Same as search bar color
+        borderRadius: borderRadius,
         border: Border(
-          bottom: BorderSide(color: Colors.grey[200]!, width: 1),
+          bottom: index == totalItems - 1 ? BorderSide.none : BorderSide(color: Colors.grey[200]!, width: 1),
         ),
       ),
       child: InkWell(
@@ -448,110 +507,177 @@ class _SearchScreenState extends State<SearchScreen> {
             CompanySelected(bond['isin']),
           );
         },
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.orange[100],
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.orange[300]!,
-                  width: 1.5,
-                ),
-              ),
-              child: bond['logo'] != null
-                  ? ClipOval(
-                      child: Image.network(
-                        bond['logo'],
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Text(
-                              'INFRA.\nMARKET',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange[800],
-                                height: 1.0,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  : Center(
-                      child: Text(
-                        'INFRA.\nMARKET',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[800],
-                          height: 1.0,
-                        ),
-                      ),
-                    ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildISINDisplay(
-                    bond['isin']?.toString() ?? 'N/A', 
-                    terms,
-                    bond['company_name']?.toString() ?? '',
+        borderRadius: borderRadius,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey[100]!,
+                    width: 1.5,
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      if (bond['rating'] != null) ...[
-                        Text(
-                          bond['rating'],
+                ),
+                child: bond['logo'] != null
+                    ? ClipOval(
+                        child: Image.network(
+                          bond['logo'],
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Text(
+                                'INFRA.\nMARKET',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange[800],
+                                  height: 1.0,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'INFRA.\nMARKET',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange[800],
+                            height: 1.0,
                           ),
                         ),
-                        Text(
-                          ' • ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                      ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildISINDisplay(
+                      bond['isin']?.toString() ?? 'N/A', 
+                      terms,
+                      bond['company_name']?.toString() ?? '',
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        if (bond['rating'] != null) ...[
+                          Text(
+                            bond['rating'],
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Text(
+                            ' • ',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                        Expanded(
+                          child: _buildMultiTermHighlightedText(
+                            bond['company_name']?.toString() ?? 'Unknown Company',
+                            terms,
+                            TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
-                      Expanded(
-                        child: _buildMultiTermHighlightedText(
-                          bond['company_name']?.toString() ?? 'Unknown Company',
-                          terms,
-                          TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.grey[400],
-            ),
-          ],
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey[400],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // Fixed highlighting method
+  List<TextSpan> _buildHighlightedTextSpans(String text, List<String> terms, TextStyle style) {
+    if (terms.isEmpty || text.isEmpty) {
+      return [TextSpan(text: text, style: style)];
+    }
+
+    List<TextSpan> spans = [];
+    String lowerText = text.toLowerCase();
+    
+    // Create a list to track which characters should be highlighted
+    List<bool> shouldHighlight = List.filled(text.length, false);
+    
+    // Mark characters that match any search term
+    for (String term in terms) {
+      if (term.isEmpty) continue;
+      String lowerTerm = term.toLowerCase();
+      
+      int index = 0;
+      while (index < lowerText.length) {
+        int matchIndex = lowerText.indexOf(lowerTerm, index);
+        if (matchIndex == -1) break;
+        
+        // Mark this range as highlighted
+        for (int i = matchIndex; i < matchIndex + lowerTerm.length && i < shouldHighlight.length; i++) {
+          shouldHighlight[i] = true;
+        }
+        
+        index = matchIndex + 1;
+      }
+    }
+    
+    // Build spans based on the highlighting map
+    int currentIndex = 0;
+    while (currentIndex < text.length) {
+      bool isHighlighted = shouldHighlight[currentIndex];
+      int spanStart = currentIndex;
+      
+      // Find the end of this span (consecutive characters with same highlight state)
+      while (currentIndex < text.length && shouldHighlight[currentIndex] == isHighlighted) {
+        currentIndex++;
+      }
+      
+      String spanText = text.substring(spanStart, currentIndex);
+      
+      if (isHighlighted) {
+        spans.add(TextSpan(
+          text: spanText,
+          style: style.copyWith(
+            backgroundColor: Color(0xFFFFF3CD), // Light yellow color similar to your image
+            color: Colors.black,
+          ),
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: spanText,
+          style: style,
+        ));
+      }
+    }
+    
+    return spans.isEmpty ? [TextSpan(text: text, style: style)] : spans;
   }
 
   Widget _buildMultiTermHighlightedText(
@@ -561,7 +687,7 @@ class _SearchScreenState extends State<SearchScreen> {
     int? maxLines,
     TextOverflow? overflow,
   }) {
-    if (terms.isEmpty) {
+    if (terms.isEmpty || text.isEmpty) {
       return Text(
         text,
         style: style,
@@ -570,50 +696,7 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     }
 
-    final lowerText = text.toLowerCase();
-    List<TextSpan> spans = [];
-    int currentIndex = 0;
-
-    List<Match> matches = [];
-    for (final term in terms) {
-      matches.addAll(term.allMatches(lowerText));
-    }
-    matches.sort((a, b) => a.start.compareTo(b.start));
-
-    for (final match in matches) {
-      if (currentIndex < match.start) {
-        spans.add(TextSpan(
-          text: text.substring(currentIndex, match.start),
-          style: style,
-        ));
-      }
-      
-      spans.add(TextSpan(
-        text: text.substring(match.start, match.end),
-        style: style.copyWith(
-          backgroundColor: Colors.yellow[200],
-          color: Colors.black,
-        ),
-      ));
-      
-      currentIndex = match.end;
-    }
-
-    if (currentIndex < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(currentIndex),
-        style: style,
-      ));
-    }
-
-    if (spans.isEmpty) {
-      return Text(
-        text,
-        style: style,
-        maxLines: maxLines,
-        overflow: overflow,
-      );
-    }
+    List<TextSpan> spans = _buildHighlightedTextSpans(text, terms, style);
 
     return RichText(
       text: TextSpan(children: spans),
@@ -647,10 +730,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.orange[100],
+                  color: Colors.grey[100],
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.orange[300]!,
+                    color: Colors.grey[300]!,
                     width: 1.5,
                   ),
                 ),
